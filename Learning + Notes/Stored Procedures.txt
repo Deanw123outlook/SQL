@@ -1,0 +1,70 @@
+Stored Procedures
+-->> A stored procedure is a subroutine available to applications that access a relational database system.
+-->> When creating a Stored Procedure execution plan is created (cached + faster)
+
+NOTES
++ SET NOCOUNTON -->> Messages - no. of row affected 
++ Output Parameters -->> Store results in paramet & output parameter accessing value from that output
+
+<------------------------------------------------------------------------------->
+
+CREATE PROCEDURE MyTestProc
+AS
+SET NOCOUNT ON
+SELECT * FROM [database].[table]
+
+EXECUTE MyTestProc
+
+<------------------------------------------------------------------------------->
+
+CREATE PROCEDURE MyTestProc2
+AS
+SET NOCOUNT OFF
+SELECT * FROM [database].[table]
+
+EXEC MyTestProc2
+
+<------------------------------------------------------------------------------->
+
+DROP PROC MyTestProc
+DROP PROC MyTestProc2
+
+<------------------------------------------------------------------------------->
+
+CREATE PROCEDURE MyFirstParamProc
+@Param_Name VARCHAR(50)
+AS
+SET NOCOUNT ON
+SELECT * FROM [database].[table]
+WHERE Column = Param_Name
+
+EXEC MyFirstParamProc @Param_Name = 'Example'
+EXEC MyFirstParamProc 'Example'
+
+<------------------------------------------------------------------------------->
+
+DROP PROC MyFirstParamProc
+
+<------------------------------------------------------------------------------->
+
+--OUTPUT PARAMETERS--
+CREATE PROC MyOutputSP
+@TopShift VARCHAR(50)
+AS 
+SET @TopShift = (SELECR TOP(1) ShiftID FROM [database].[table])
+
+DECLARE @outputresult VARCHAER(50)
+EXEC MyOutputSP @outputresuly output
+SELECT @outputresult
+
+------------------------------------------------------------------------------->
+
+DROP PROC MyOutputSP
+
+<------------------------------------------------------------------------------->
+
+
+
+
+
+

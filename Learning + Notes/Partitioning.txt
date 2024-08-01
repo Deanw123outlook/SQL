@@ -1,0 +1,46 @@
+PARTITIONING (Enterprise Addition)
+
+-> Useful when we have large amounts of data we can use the concept of partitioning to handle statements. Essentially we are breaking tables into smaller partitions which is
+   less computationally heaviy.
+
+<------------------------------------------------------------------------------->
+
+CREATE PARTITION FUNCTION cpu_func(int) /***specifiy data toye of partition key***/
+SET NOCOUNT ON
+AS RANGE RIGHT
+FOR VALUES (1000,2000,3000,4000,5000)
+
+<------------------------------------------------------------------------------->
+
+CREATE PARITION SCHEME cpu_scheme
+AS PARTITION cpu_func
+TO (fgp1,fgp2,fgb3,fgb4,fgb5,fgb6) /*** need to add file groups via DB -->> PROPERTIES***/
+
+<------------------------------------------------------------------------------->
+
+CREATE TABLE PARTITION
+(EMPID int identity(1,1) NOT NULL,
+ empdate dtaetime NULL)
+ON cpu_scheme (EMPID)
+
+--------------------------------------
+
+DECARE @i INT
+SET @i = 0
+WHILE @i<10000
+BEGIN
+INSERT INTO [PARTITION] (empdate) values (GETDATE())
+SET @i = @i + 1
+END
+
+--------------------------------------
+
+SELECT $partition.cpu_func(EMOID) AS 'parition number'
+FROM [partiton]
+
+<------------------------------------------------------------------------------->
+
+
+
+
+
