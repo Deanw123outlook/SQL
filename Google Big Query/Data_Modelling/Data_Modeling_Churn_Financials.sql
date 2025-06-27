@@ -1,5 +1,3 @@
---
---
 -- DATA MODELING
 -- CHURN & FINANCIAL METRICS (30 day subscription_date)
 WITH user_data AS (
