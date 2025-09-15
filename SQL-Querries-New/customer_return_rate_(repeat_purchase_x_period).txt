@@ -1,0 +1,37 @@
+--
+-- CUSTOMER RETURN RATE MODELING
+WITH customer_purchases AS (
+    SELECT 
+        customer_id,
+        DATE,
+        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY DATE) AS txn_number
+    FROM "TEST_DATABASE"."PUBLIC"."TABLE_T1"
+),
+first_purchase AS (
+    SELECT customer_id, DATE AS first_date
+    FROM customer_purchases
+    WHERE txn_number = 1 
+),
+subsequent_purchases AS (
+    SELECT 
+        cp.customer_id,
+        cp.DATE,
+        fp.first_date
+    FROM customer_purchases cp
+    JOIN first_purchase fp
+      ON cp.customer_id = fp.customer_id
+    WHERE cp.txn_number > 1
+)
+SELECT 
+    COUNT(DISTINCT fp.customer_id) AS total_unique_customers,
+    -- returning customer x period
+    COUNT(DISTINCT CASE WHEN DATEDIFF(DAY, fp.first_date, sp.DATE) <= 7 THEN fp.customer_id END) AS returned_within_3_days,
+    -- returning customer x period
+    ROUND(
+        COUNT(DISTINCT CASE WHEN DATEDIFF(DAY, fp.first_date, sp.DATE) <= 7
+        THEN fp.customer_id END) 
+        / COUNT(DISTINCT fp.customer_id) * 100, 2
+    ) AS return_rate_pct
+FROM first_purchase fp
+LEFT JOIN subsequent_purchases sp 
+  ON fp.customer_id = sp.customer_id;
